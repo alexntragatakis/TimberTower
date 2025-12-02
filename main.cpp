@@ -1,11 +1,13 @@
 #include "FEHLCD.h"
 #include <FEHImages.h>
+#include <math.h>
 
-class Block {
+class Block { // 3x1 (long), 1x3 (tall), 2x2
     private:
         int shape;
         // Dimensions
         float x_pos;
+        float y_pos;
         float height;
         float length;
         float mass;
@@ -26,7 +28,9 @@ int main()
     FEHImage menuBg;
     float x_pos, y_pos; //coords clicked
     float x_trash, y_trash; //coords released at
-    int total_games = 0, total_blocks = 0, tallest_tower = 0;
+    int counter;
+    Block blocks[100];
+    int total_games = 0, total_blocks = 0, tallest_tower = 0; //for DisplayResults()
 
     /* Background image for menu screen */
     menuBg.Open("MenuBG.png");
@@ -128,6 +132,23 @@ int main()
         LCD.Update();
     }
     return 0;
+}
+
+int Block::RandomizeBlock() {
+    shape = rand() % 3;
+    mass = rand() % 41 + 10;
+    if(shape == 0) {
+        height = 1;
+        length = 3;
+    }
+    else if(shape == 1) {
+        height = 3;
+        length = 1;
+    }
+    else if(shape == 2) {
+        height = 2;
+        length = 2;
+    }
 }
 
 void Block::CalculatePhysicalProps() {
