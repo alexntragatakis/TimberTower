@@ -1,6 +1,20 @@
 #include "FEHLCD.h"
 #include <FEHImages.h>
 
+class Block {
+    private:
+    int shape;
+    float inertia;
+    float mass;
+    public:
+    int RandomizeBlock();
+    int CalculatePhysicalProps();
+};
+
+void BlockFall();
+bool CheckTowerFall();
+void DisplayResults();
+
 int main()
 {
     FEHImage menuBg;
@@ -12,7 +26,7 @@ int main()
     menuBg.Open("MenuBG.png");
     menuBg.Draw(0, -10);
     
-    /* Buttons on menu */
+    /* Buttons on menu */ 
     LCD.SetFontColor(LIGHTBLUE);
     LCD.FillRectangle(40, 115, 100, 40);
     LCD.FillRectangle(175, 115, 100, 40);
