@@ -4,6 +4,8 @@
 int main()
 {
     FEHImage menuBg;
+    float x_pos, y_pos; //coords clicked
+    float x_trash, y_trash; //coords released at
 
     /* Background image for menu screen */
     menuBg.Open("MenuBG.png");
@@ -27,7 +29,25 @@ int main()
     LCD.WriteAt("Leaderboard", 55, 188);
     LCD.WriteAt("Credits", 203, 188);
 
+    /* Display next screen from menu */
+    while(!LCD.Touch(&x_pos, &y_pos)) {} // Wait for touch
+    while(LCD.Touch(&x_trash, &y_trash)); // Wait for release
+
+    if(x_pos > 40 && x_pos < 140 && y_pos > 115 && y_pos < 155) { // Play
+        LCD.Write("Play clicked");
+    }
+    else if(x_pos > 175 && x_pos < 275 && y_pos > 115 && y_pos < 155) { // How to Play
+        LCD.Write("How to Play clicked");
+    }
+    else if(x_pos > 40 && x_pos < 140 && y_pos > 175 && y_pos < 215) { // Leaderboard
+        LCD.Write("Leaderboard clicked");
+    }
+    else if(x_pos > 175 && x_pos < 275 && y_pos > 175 && y_pos < 215 ) { // Credits
+        LCD.Write("Credits clicked");
+    }
+
     while (1) {
+        
         LCD.Update();
         // Never end
     }
