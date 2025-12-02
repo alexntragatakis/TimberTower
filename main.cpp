@@ -15,8 +15,10 @@ class Block {
         float momentOfInertia;
         float centerOfMass;
     public:
+        float * GetXnLength();
         float GetMass();
         float GetCenterOfMass();
+
         int RandomizeBlock();
         void CalculatePhysicalProps();
         bool CheckBlockFall();
@@ -25,8 +27,10 @@ class Block {
 class Tower {
     private:
         class Block b[200];
+        int blockCount;
     public:
         bool CheckTowerFall();
+        bool CheckBlockFall();
 };
 
 void DisplayResults();
@@ -140,6 +144,13 @@ int main()
     return 0;
 }
 
+float * Block::GetXnLength() {
+    float array[2];
+    array[0] = x_pos;
+    array[1] = length;
+    return array;
+}
+
 float Block::GetMass() {
     return mass;
 }
@@ -168,6 +179,13 @@ int Block::RandomizeBlock() {
 void Block::CalculatePhysicalProps() {
     // Center of mass for both rectangles and box
     centerOfMass = x_pos + (0.5)*length;
+}
+
+bool Tower::CheckBlockFall() {
+    if (b[blockCount-1].GetCenterOfMass() < b[blockCount-2].GetXnLength()[0]
+    && b[blockCount-1].GetCenterOfMass() > b[blockCount-2].GetXnLength()[0]+b[blockCount-2].GetXnLength()[1]) {
+        return true; // Block will tip over and fall
+    }
 }
 
 void DisplayResults() {
