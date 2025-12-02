@@ -2,7 +2,7 @@
 #include <FEHImages.h>
 #include <math.h>
 
-class Block { // 3x1 (long), 1x3 (tall), 2x2
+class Block {
     private:
         int shape;
         // Dimensions
@@ -17,10 +17,16 @@ class Block { // 3x1 (long), 1x3 (tall), 2x2
     public:
         int RandomizeBlock();
         void CalculatePhysicalProps();
+        bool CheckBlockFall();
 };
 
-void BlockFall();
-bool CheckTowerFall();
+class Tower {
+    private:
+        class Block b[];
+    public:
+        bool CheckTowerFall();
+};
+
 void DisplayResults();
 
 int main()
@@ -28,9 +34,7 @@ int main()
     FEHImage menuBg;
     float x_pos, y_pos; //coords clicked
     float x_trash, y_trash; //coords released at
-    int counter;
-    Block blocks[100];
-    int total_games = 0, total_blocks = 0, tallest_tower = 0; //for DisplayResults()
+    int total_games = 0, total_blocks = 0, tallest_tower = 0;
 
     /* Background image for menu screen */
     menuBg.Open("MenuBG.png");
@@ -152,11 +156,6 @@ int Block::RandomizeBlock() {
 }
 
 void Block::CalculatePhysicalProps() {
-    // TODO: Create moment of inertia calculations for each shape
-    // Rectangle
-    momentOfInertia = (1/12)*mass*(pow(height,2)+pow(length,2));
-
-    // TODO: Create center of gravity calculations for each shape
-    // Rectangle
-    centerOfMass = x_pos + (1/2)*length;
+    // Center of mass for both rectangles and box
+    centerOfMass = x_pos + (0.5)*length;
 }
