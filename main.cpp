@@ -12,7 +12,6 @@ class Block {
         float length;
         float mass;
         // Physical properties
-        float momentOfInertia;
         float centerOfMass;
     public:
         float * GetXnLength();
@@ -28,6 +27,7 @@ class Tower {
     private:
         class Block b[200];
         int blockCount;
+        float towerCOM;
     public:
         bool CheckTowerFall();
         bool CheckBlockFall();
@@ -200,6 +200,28 @@ bool Tower::CheckBlockFall() {
     if (b[blockCount-1].GetCenterOfMass() < b[blockCount-2].GetXnLength()[0]
     && b[blockCount-1].GetCenterOfMass() > b[blockCount-2].GetXnLength()[0]+b[blockCount-2].GetXnLength()[1]) {
         return true; // Block will tip over and fall
+    }
+    else {
+        return false;
+    }
+}
+
+bool Tower::CheckTowerFall() {
+    // Get the tower center of mass
+    float totalMass=0;
+    for (int i=0; i<blockCount; i++) {
+        towerCOM+=(b[blockCount-1].GetMass() * b[blockCount-1].GetCenterOfMass());
+        totalMass+=b[blockCount-1].GetMass();
+    }
+    towerCOM/=totalMass;
+
+    // Check if tower center of mass is outside
+    // TODO: make actual platform dimensions (this assumes 100 < x < 200)
+    if (towerCOM < 100 || towerCOM > 200) {
+        return true; // tower tips over
+    }
+    else {
+        return false;
     }
 }
 
