@@ -37,7 +37,7 @@ void DisplayResults();
 
 int main()
 {
-    FEHImage menuBg, woodLong, woodTall;
+    FEHImage menuBg, woodLong, woodTall, woodSquare;
     float x_pos, y_pos; //coords clicked
     float x_trash, y_trash; //coords released at
     int total_games = 0, total_blocks = 0, tallest_tower = 0;
@@ -48,6 +48,8 @@ int main()
 
     /* Images for building materials */
     woodLong.Open("WoodPlankLong.png");
+    woodTall.Open("WoodPlankTall.png");
+    woodSquare.Open("WoodPlankSquare.png");
     
     /* Buttons on menu */ 
     LCD.SetFontColor(LIGHTBLUE);
