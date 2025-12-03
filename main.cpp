@@ -300,6 +300,23 @@ void addToPlayBlock(class Block *block) {
     LCD.Update();
 }
 
+void dragBlock(class Block *block, int count) { // Index of dragged block is count-1
+    float x_pos, y_pos;
+    while (LCD.Touch(&x_pos, &y_pos)) {
+    // Print background
+    
+    // Reprint previous blocks
+        for (int i=0; i<count-1; i++) {
+            block[i].GetImage().Draw(block[i].GetXnLength()[0], block[i].GetYnHeight()[0]);
+        }
+    // Print next block
+        block[count].GetImage().Draw(block[count].GetXnLength()[0], block[count].GetYnHeight()[0]);
+    // Draw dragged block
+        block[count-1].GetImage().Draw(x_pos,y_pos);
+        LCD.Update();
+    }
+}
+
 void PlayGame() {
     bool playing = true;
     class Block blocks[100];
