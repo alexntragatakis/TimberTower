@@ -1,6 +1,7 @@
 #include "FEHLCD.h"
 #include <FEHImages.h>
 #include <math.h>
+#include <stdio.h>
 
 class Block {
     private:
@@ -16,7 +17,6 @@ class Block {
         float centerOfMass;
     public:
         void SetXnY(float x, float y);
-
         float * GetXnLength();
         float * GetYnHeight();
         float GetMass();
@@ -39,19 +39,21 @@ class Tower {
         bool CheckBlockFall();
 };
 
-void PlayGame();
+void PlayGame(Tower);
 void DisplayResults();
 
 int main()
 {
-    FEHImage menuBg, woodLong, woodTall, woodSquare;
+    FEHImage menuBg, gameBg, woodLong, woodTall, woodSquare;
     float x_pos, y_pos; //coords clicked
     float x_trash, y_trash; //coords released at
     int total_games = 0, total_blocks = 0, tallest_tower = 0;
+    Tower t;
 
-    /* Background image for menu screen */
+    /* Background image for menu and game */
     menuBg.Open("MenuBG.png");
     menuBg.Draw(0, -10);
+    gameBg.Open("GameBG.png");
 
     /* Images for building materials */
     woodLong.Open("WoodPlankLong.png");
@@ -82,10 +84,9 @@ int main()
         while(LCD.Touch(&x_trash, &y_trash)); // Wait for release
 
         if(x_pos > 40 && x_pos < 140 && y_pos > 115 && y_pos < 155) { // Play   
-            PlayGame();     
-            //LCD.SetFontColor(BLACK);
-            //LCD.FillRectangle(0, 0, 500, 500);
-            //LCD.SetFontColor(WHITE);
+            gameBg.Draw(0, 0);
+            LCD.Update();
+            PlayGame(t);     
             DisplayResults();
             LCD.Write("Play game here");
             LCD.WriteAt("<Quit>", 280, 200);
@@ -283,9 +284,6 @@ void DisplayResults() {
     LCD.WriteAt("Number of Blocks:", 50, 70);
 }
 
-
-
-
 void addNextBlock(class Block *block) {
     block->RandomizeBlock();
     block->CalculatePhysicalProps();
@@ -295,39 +293,65 @@ void addNextBlock(class Block *block) {
 }
 
 void addToPlayBlock(class Block *block) {
-    block->SetXnY(100,100); // todo: Set coords where "play" placeholder is
-    block->GetImage().Draw(120,120);
+    block->SetXnY(40,40); // todo: Set coords where "play" placeholder is
+    block->GetImage().Draw(40,40);
     LCD.Update();
 }
 
 void dragBlock(class Block *block, int count) { // Index of dragged block is count-1
     float x_pos, y_pos;
+    printf("It reached this far");
+    while (!LCD.Touch(&x_pos, &y_pos)){};
     while (LCD.Touch(&x_pos, &y_pos)) {
     // Print background
     
     // Reprint previous blocks
-        for (int i=0; i<count-1; i++) {
+        /*for (int i=0; i<=count-1; i++) {
             block[i].GetImage().Draw(block[i].GetXnLength()[0], block[i].GetYnHeight()[0]);
-        }
+            
+        }*/
+
     // Print next block
-        block[count].GetImage().Draw(block[count].GetXnLength()[0], block[count].GetYnHeight()[0]);
+        //block[count].GetImage().Draw(block[count].GetXnLength()[0], block[count].GetYnHeight()[0]);
+        block[count].GetImage().Draw(30, 30);
     // Draw dragged block
         block[count-1].GetImage().Draw(x_pos,y_pos);
         LCD.Update();
+        printf("It reached this farx2");
     }
 }
 
-void PlayGame() {
+void PlayGame(Tower t) {
     bool playing = true;
+    int index = 0, x_pos, y_pos;
     class Block blocks[100];
     while (playing) {
-        // Print Background Image
-
         // Create the first block
-        blocks[0].RandomizeBlock();
-        blocks[0].CalculatePhysicalProps();
-        addToPlayBlock(&blocks[0]);
-        // Create next block
-        addNextBlock(&blocks[1]);
+        if(index == 0) {
+            blocks[index].RandomizeBlock();
+            blocks[index].CalculatePhysicalProps();
+            addToPlayBlock(&blocks[index]);
+        }
+
+        // Create the next block
+        blocks[index + 1].RandomizeBlock();
+        blocks[index + 1].CalculatePhysicalProps();
+        addToPlayBlock(&blocks[index + 1]);
+        
+        //dragBlock(&blocks[index], index+1);
+
+        while (!LCD.Touch(&x_pos, &y_pos)){};
+        while (LCD.Touch(&x_pos, &y_pos)) {
+            blocks[index].GetImage().Close();
+            blocks[index].GetImage().Draw(x_pos, y_pos);
+        }
+        
+        
+        if(t.CheckTowerFall()) { //If tower falls, end game and display results
+            break;
+        }
+        else { //add another block
+            index++;
+        }  
     }
 }
