@@ -323,6 +323,8 @@ void PlayGame() {
         
         LCD.Update();
         for (int i=0;i<10;i++) {
+            bool condition1 = (i==0), condition2 = (i>0);
+
             // Dragging for the toPlay block
             while (!LCD.Touch(&x_pos, &y_pos)){};
             generateNextBlock(&blocks[blockCount]);
@@ -344,7 +346,8 @@ void PlayGame() {
             blockCount+=1;
             blocks[blocksInPlay].SetXnY(x_pos,y_pos);
             // While block isn't hitting the platform, make it fall
-            while (blocks[blocksInPlay].GetYnHeight()[0]+blocks[blocksInPlay].GetYnHeight()[1] < 200) {
+            while ((condition1 && blocks[blocksInPlay].GetYnHeight()[0]+blocks[blocksInPlay].GetYnHeight()[1] < 200) || 
+            (condition2 && (blocks[blocksInPlay].GetYnHeight()[0]+blocks[blocksInPlay].GetYnHeight()[1] < blocks[blocksInPlay-1].GetYnHeight()[0]) )) {
                 gameBg.Draw(0,0);
                 // Draw blocks in play
                 for (int i=0;i<blocksInPlay;i++) {
