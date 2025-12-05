@@ -270,13 +270,13 @@ void DisplayResults() {
 }
 
 void moveNextBlock(class Block *block) {
-    block->SetXnY(290,200); // todo: Set coords where "next" placeholder is
-    block->GetImage().Draw(290,180);
+    block->SetXnY(290,224-block->GetYnHeight()[1]); // todo: Set coords where "next" placeholder is
+    block->GetImage().Draw(290,224-block->GetYnHeight()[1]);
 }
 
 void moveToPlayBlock(class Block *block) {
-    block->SetXnY(250,200); // todo: Set coords where "play" placeholder is
-    block->GetImage().Draw(250,180);
+    block->SetXnY(250,224-block->GetYnHeight()[1]); // todo: Set coords where "play" placeholder is
+    block->GetImage().Draw(250,224-block->GetYnHeight()[1]);
 }
 
 void generateNextBlock(class Block *block) {
