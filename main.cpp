@@ -29,8 +29,8 @@ class Block {
 
 bool CheckTowerFall(Block b[], int blockCount);
 
-void PlayGame();
-void DisplayResults();
+void PlayGame(int *, int *);
+void DisplayResults(int, int);
 
 int main()
 {
@@ -38,6 +38,7 @@ int main()
     float x_pos, y_pos; //coords clicked
     float x_trash, y_trash; //coords released at
     int total_games = 0, total_blocks = 0, tallest_tower = 0;
+    int game_blocks, game_height;
 
     /* Background image for menu and game */
     menuBg.Open("MenuBG.png");
@@ -75,8 +76,10 @@ int main()
         if(x_pos > 40 && x_pos < 140 && y_pos > 115 && y_pos < 155) { // Play   
             gameBg.Draw(0, 0);
             LCD.Update();
-            PlayGame();     
-            DisplayResults();
+            game_blocks = 0;
+            game_height = 0;
+            PlayGame(&game_blocks, &game_height);     
+            DisplayResults(game_blocks, game_height);
             LCD.Write("Play game here");
             LCD.WriteAt("<Quit>", 280, 200);
         }
@@ -243,7 +246,7 @@ bool CheckTowerFall(Block b[], int blockCount) {
     return false; // Runs through the loop and nothing falls
 }
 
-void DisplayResults() {
+void DisplayResults(int game_blocks, int game_height) {
     LCD.SetFontColor(STEELBLUE);
     LCD.FillRectangle(0, 0, 320, 240);
     LCD.SetFontColor(LIGHTSTEELBLUE);
@@ -252,7 +255,9 @@ void DisplayResults() {
     LCD.DrawRectangle(25, 15, 270, 210);
     LCD.WriteAt("Results", 140, 25);
     LCD.WriteAt("Tower Height:", 50, 50);
+    LCD.WriteAt(game_height, 130, 50);
     LCD.WriteAt("Number of Blocks:", 50, 70);
+    LCD.WriteAt(game_blocks, 150, 70);
 }
 
 void moveNextBlock(class Block *block) {
@@ -271,7 +276,7 @@ void generateNextBlock(class Block *block) {
     block->CalculatePhysicalProps();
 }
 
-void PlayGame() {
+void PlayGame(int * game_blocks, int * game_height) {
     FEHImage gameBg;
     gameBg.Open("GameBG.png");
 
@@ -332,6 +337,10 @@ void PlayGame() {
                 LCD.Update();
             }
             if(CheckTowerFall(&(blocks[0]), blocksInPlay)) { //If tower falls, end game and display results
+                (*game_blocks) = blocksInPlay;
+                for (int i=0; i<=blocksInPlay; i++) {
+                    (*game_height)+=blocks[i].GetYnHeight()[1];
+                }
                 return;
             }
             else { blocksInPlay+=1; }
