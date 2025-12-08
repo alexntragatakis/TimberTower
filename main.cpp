@@ -70,6 +70,15 @@ int main()
     LCD.WriteAt("How to Play", 192, 128);
     LCD.WriteAt("Statistics", 55, 188);
     LCD.WriteAt("Credits", 203, 188);
+    // Title
+    LCD.SetFontColor(LIGHTBLUE);
+    LCD.FillRectangle(45, 30, 230, 40);
+    LCD.SetFontColor(WHITESMOKE);
+    LCD.DrawRectangle(45, 30, 230, 40);
+    LCD.SetFontColor(BLACK);
+    LCD.SetFontScale(1.5);
+    LCD.WriteAt("Timber Tower", 50, 35);
+    LCD.SetFontScale(0.5);
 
     while (1) {
         /* Waits for the user to click a button and remembers the location the click was at */
@@ -154,6 +163,15 @@ int main()
         // Returns to main menu once Quit is clicked 
         while(!LCD.Touch(&x_pos, &y_pos)) {} // Wait for touch
         while(LCD.Touch(&x_trash, &y_trash)); // Wait for release
+        if (x_pos>0 && x_pos < 40 && y_pos>0 && y_pos < 20) { // Replay is clicked
+            gameBg.Draw(0, 0); // Draws game background
+            LCD.Update();
+            game_blocks = 0; // Number of blocks used in the current game (starts at 0)
+            game_height = 0; // Height of the tower in the current game (starts at 0)
+
+            // Calls PlayGame function to start the game
+            PlayGame(&game_blocks, &game_height);
+        }
         if(x_pos > 280 && x_pos < 320 && y_pos > 200 && y_pos < 220) { // Quit is clicked
             /* Draws background image for menu screen */
             menuBg.Open("MenuBG.png");
@@ -176,6 +194,15 @@ int main()
             LCD.WriteAt("How to Play", 192, 128);
             LCD.WriteAt("Statistics", 55, 188);
             LCD.WriteAt("Credits", 203, 188);
+            // Title
+            LCD.SetFontColor(LIGHTBLUE);
+            LCD.FillRectangle(45, 30, 230, 40);
+            LCD.SetFontColor(WHITESMOKE);
+            LCD.DrawRectangle(45, 30, 230, 40);
+            LCD.SetFontColor(BLACK);
+            LCD.SetFontScale(1.5);
+            LCD.WriteAt("Timber Tower", 50, 35);
+            LCD.SetFontScale(0.5);
         }
         LCD.Update();
     }
@@ -260,7 +287,9 @@ void Block::CalculatePhysicalProps() {
 }
 
 /* bool CheckTowerFall - Returns true if the tower falls after a block is added and false if not 
-Calculations are based on the center of mass of the tower as a whole 
+The tower center of mass is calculated, and it is checked if this center of mass is on the platform.
+Then, blocks on other blocks are checked to make sure that for each stack of blocks on other blocks, the
+center of mass is over the length of the block.
 - Alex */
 bool CheckTowerFall(Block b[], int blockCount) {
     // Recalculate physical properties for each block
@@ -316,27 +345,51 @@ void DisplayResults(int game_blocks, int game_height) {
     LCD.WriteAt("meters", 180, 50);
     LCD.WriteAt("Number of Blocks:", 50, 70);
     LCD.WriteAt(game_blocks, 160, 70);
+    // Draw replay button
+    LCD.Write("<Replay>");
 }
 
+/*void moveNextBlock - This function takes in the address of a block and edits the X and Y positions of the box.
+It then draws the block's image at the set X and Y positions.
+This Y value is set so that the block is sitting visually on the floor.
+The X position corresponds to the spot for which the next block (second in line) is sitting.
+- Alex */
 void moveNextBlock(class Block *block) {
     block->SetXnY(290,224-block->GetYnHeight()[1]); // todo: Set coords where "next" placeholder is
     block->GetImage().Draw(290,224-block->GetYnHeight()[1]);
 }
 
+/*void moveToPlayBlock - This function takes in the address of a block and edits the X and Y positions of the box.
+It then draws the block's image at the set X and Y positions.
+This Y value is set so that the block is sitting visually on the floor.
+The X value corresponds to the spot for which the block next in line (the "to play" block) is sitting.
+A statement that says that this block weights __ kg is shown on the screen.
+- Alex */
 void moveToPlayBlock(class Block *block) {
     block->SetXnY(250,224-block->GetYnHeight()[1]); // todo: Set coords where "play" placeholder is
     block->GetImage().Draw(250,224-block->GetYnHeight()[1]);
     int intWeight = block->GetMass();
     LCD.WriteAt(intWeight,210,175);
-    LCD.WriteAt("Next block weighs", 210, 165);
+    LCD.WriteAt("This block weighs", 210, 165);
     LCD.WriteAt("Kilograms",230,175);
 }
 
+/*void generateNextBlock - This function uses the class block's functions to assign random values and physical
+properties to the block according to those functions calculations (see their descriptions)
+- Alex */
 void generateNextBlock(class Block *block) {
     block->RandomizeBlock();
     block->CalculatePhysicalProps();
 }
 
+/*void PlayGame - This function defines how the game is played.
+The first two blocks to play are randomized and placed on the screen, and the block counter increases accordingly.
+A for loop defines the repetition of placing blocks on the screen includes the following process.
+If the user's cursor is within the block's area, the user can drag this block to a place on the screen.
+When it is released, the block is vertically placed at the top of the screen and drops by gravity to the platform.
+Then, the tower is checked according to the previously defined functions, and values taken in (game blocks and game height)
+are editted and and the function ends.
+- Alex */
 void PlayGame(int * game_blocks, int * game_height) {
     FEHImage gameBg;
     gameBg.Open("GameBG.png");
@@ -356,7 +409,7 @@ void PlayGame(int * game_blocks, int * game_height) {
         blockCount+=1;
         
         LCD.Update();
-        for (int i=0;i<10;i++) {
+        for (int i=0;i<20;i++) {
             bool condition1 = (i==0), condition2 = (i>0);
 
             // Dragging for the toPlay block
